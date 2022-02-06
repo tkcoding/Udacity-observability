@@ -56,6 +56,10 @@ kubectl create -n observability -f https://raw.githubusercontent.com/jaegertraci
 
 *Solution*:
 ```
+*Note: This setup will take long for deployment to get ready.*
+*You can check for the deployment through  'kubectl describe deployment jaeger-operator -n observability'*
+
+
 There's two line code to help install all jaeger resources
 kubectl create namespace observability # <1>
 kubectl create -f https://github.com/jaegertracing/jaeger-operator/releases/download/v1.30.0/jaeger-operator.yaml -n observability # <2>
