@@ -1,28 +1,33 @@
 **Note:** For the screenshots, you can store all of your answer images in the `answer-img` directory.
 
-# Issues while setting up for Observability project and solution:
+# Issues while setting up for observability project and solution:
 
 *Issue 0* : Kubectl: The connection to the server 127.0.0.1:6443 was refused.
+
 *Solution* :Refer to repo vagrant file for adding port forward 'config.network"forwarded_port",guest: 6443,host: 6443'
 
 *Issue 1*: Vagrant was unable to mount VirtualBox shared folders. This is usually because the filesystem "vboxsf" is not available.
+
 *Solution*: https://stackoverflow.com/questions/43492322/vagrant-was-unable-to-mount-virtualbox-shared-folders
 
 *Issue 2*: Error: INSTALLATION FAILED: failed to download "prometheus-community/kube-prometheus-stack"
+
 *Solution* : 
-Go to vagrant ssh box:
-Step 1  : Install helm chart:
-curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
-chmod 700 get_helm.sh
-./get_helm.sh
+'''
+  Go to vagrant ssh box:
+ Step 1  : Install helm chart:
+ curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
+ chmod 700 get_helm.sh
+ ./get_helm.sh
+'''
 
-Step 2 : install prometheus community
-helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
-helm repo update
-helm install prometheus prometheus-community/kube-prometheus-stack --namespace monitoring --kubeconfig /etc/rancher/k3s/k3s.yaml
+* Step 2 : install prometheus community
+* helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+* helm repo update
+* helm install prometheus prometheus-community/kube-prometheus-stack --namespace monitoring --kubeconfig /etc/rancher/k3s/k3s.yaml
 
-After installation without error:
-Runs 'kubectl get pods -n monitoring' to check all pods should be running.
+* After installation without error:
+* Runs 'kubectl get pods -n monitoring' to check all pods should be running.
 
 *Issue 3*: error: unable to read URL "https://raw.githubusercontent.com/jaegertracing/jaeger-operator//deploy/crds/jaegertracing.io_jaegers_crd.yaml", server reported 404 Not Found, status code=404
 
