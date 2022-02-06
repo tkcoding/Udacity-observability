@@ -52,7 +52,16 @@ kubectl create -n observability -f https://raw.githubusercontent.com/jaegertraci
 kubectl create -n observability -f https://raw.githubusercontent.com/jaegertracing/jaeger-operator/${jaeger_version}/deploy/operator.yaml
 ```
 
+*Issue 4*: Observability - jaeger have no resources
 
+*Solution*:
+```
+There's two line code to help install all jaeger resources
+kubectl create namespace observability # <1>
+kubectl create -f https://github.com/jaegertracing/jaeger-operator/releases/download/v1.30.0/jaeger-operator.yaml -n observability # <2>
+
+Reference link : https://www.jaegertracing.io/docs/1.30/operator/
+```
 
 ## Verify the monitoring installation
 
