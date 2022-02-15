@@ -79,10 +79,18 @@ Reference link : https://www.jaegertracing.io/docs/1.30/operator/
 *TODO:* Create a dashboard in Grafana that shows Prometheus as a source. Take a screenshot and include it here.
 
 ## Describe SLO/SLI
-*TODO:* Describe, in your own words, what the SLIs are, based on an SLO of *monthly uptime* and *request response time*.
-
+```
+SLO - The end goal of a standard level of performance in a measurable period of time for e.g. 99.5% server uptime in a month
+SLI - Measurement on performance specifically this make measuring the objective we set in SLO measurable.  for e.g. number of server error causing unplanned reboot.
+```
 ## Creating SLI metrics.
-*TODO:* It is important to know why we want to measure certain metrics for our customer. Describe in detail 5 metrics to measure these SLIs. 
+```
+* Error Rate
+* Response time
+* Availability
+* Throughput
+* Latency
+```
 
 ## Create a Dashboard to measure our SLIs
 *TODO:* Create a dashboard to measure the uptime of the frontend and backend services We will also want to measure to measure 40x and 50x errors. Create a dashboard that show these values over a 24 hour period and take a screenshot.
