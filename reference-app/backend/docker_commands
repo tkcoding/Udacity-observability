@@ -1,0 +1,2 @@
+docker build -t tkonthemove/backend:latest .
+docker push tkonthemove/backend:latest

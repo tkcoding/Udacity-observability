@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: trial
-        image: tkonthemove/observability_trial:v1
+        image: tkonthemove/observability_trial:v2
         ports:
         - containerPort: 8080
 ---

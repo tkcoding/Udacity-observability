@@ -1,0 +1,2 @@
+docker build -t tkonthemove/observability_frontend:latest .
+docker push tkonthemove/observability_frontend:latest

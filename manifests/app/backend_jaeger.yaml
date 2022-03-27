@@ -1,0 +1,46 @@
+apiVersion: jaegertracing.io/v1
+kind: Jaeger
+metadata:
+  name: backend-traces
+  namespace: observability
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend-traces-query
+  namespace: observability
+spec:
+  ports:
+    - name: backend-traces-query
+      port: 16686
+      protocol: TCP
+      targetPort: 16686
+      nodePort: 30687
+  selector:
+    app: jaeger
+    app.kubernetes.io/component: all-in-one
+    app.kubernetes.io/instance: backend-traces
+    app.kubernetes.io/managed-by: jaeger-operator
+    app.kubernetes.io/name: backend-traces
+    app.kubernetes.io/part-of: jaeger
+  type: NodePort
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: backend-traces
+  namespace: monitoring
+  labels:
+    app: backend-traces
+    release: prometheus
+spec:
+  selector:
+    matchLabels:
+      app: backend-traces
+  endpoints:
+  - port: backend-traces
+    path: /metrics
+    interval: 15s
+  namespaceSelector:
+    matchNames:
+    - default

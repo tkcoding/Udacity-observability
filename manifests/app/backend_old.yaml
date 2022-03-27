@@ -22,16 +22,15 @@ spec:
     spec:
       containers:
       - env:
-        - name: JAEGER_HOST
-          # This should be defined
-          value: backend-traces-agent.observability.svc.cluster.local
+        - name: JAEGER_AGENT_HOST
+          value: hotrod-traces-agent.observability.svc.cluster.local
         image: tkonthemove/backend:latest
         imagePullPolicy: Always
         name: backend
         ports:
         - name: backendport
           containerPort: 8080
-          protocol: TCP
+          protocol : TCP
 ---
 apiVersion: v1
 kind: Service
