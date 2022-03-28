@@ -2,6 +2,14 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: trial-app
+  annotations:
+    "sidecar.jaegertracing.io/inject": "true"
+    prometheus.io/scrape: "true"
+    prometheus.io/path: /metrics
+    prometheus.io/port: trialport
+  labels:
+    name: trial
+    release: prometheus
 spec:
   replicas: 3
   selector:
@@ -13,19 +21,29 @@ spec:
         app: trial
     spec:
       containers:
-      - name: trial
-        image: tkonthemove/observability_trial:v2
+      - env:
+        - name: JAEGER_HOST
+          value: backend-traces-agent.observability.svc.cluster.local
+        name: trial
+        image: tkonthemove/observability_trial:latest
+        imagePullPolicy: Always
         ports:
-        - containerPort: 8080
+        - name: trialport
+          containerPort: 8083
+          protocol: TCP
 ---
 apiVersion: v1
 kind: Service
 metadata:
   name: trial-service
+  labels:
+    app: trial # service-monitor target
 spec:
   selector:
-    app: trial
+    app: trial # pod selection criteria
   ports:
-    - port: 8082
-      targetPort: 8080
+    - name: trial # must exist for prometheus scraping
+      port: 8083
+      protocol: TCP
+      targetPort: trialport
   type: LoadBalancer
