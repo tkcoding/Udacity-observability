@@ -174,3 +174,13 @@ Description: Accessing /trace route in trial service get error 500.
 *TODO*: Create a Dashboard containing graphs that capture all the metrics of your KPIs and adequately representing your SLIs and SLOs. Include a screenshot of the dashboard here, and write a text description of what graphs are represented in the dashboard.  
 
 ![final_dashboard](answer-img/grafana_final_dashboard.png)
+
+The highest row of the dashboard show the total CPU usage and Memory usage from the current resources.
+
+Second row left diagram show endpoint request per minute for different route and status return.
+
+Second row right diagram show Backend Availability and Frontend availability underneath it.
+
+Third row shows the backend 40X error count over 24 hours period.
+
+Last row shows jaeger frontend homepage response time.
