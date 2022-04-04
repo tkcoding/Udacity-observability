@@ -1,5 +1,5 @@
 Flask
-Flask-Opentracing==0.2.0 # Flask-Opentracing doesn't support opentracing >=2 yet
+Flask-OpenTracing==1.1.0
 requests
 pylint
 gunicorn
@@ -14,3 +14,4 @@ opentelemetry-distro
 opentelemetry-instrumentation-flask
 opentelemetry-instrumentation-requests
 prometheus-flask-exporter
+jaeger-client

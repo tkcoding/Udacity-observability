@@ -24,7 +24,7 @@ spec:
       - env:
         - name: JAEGER_HOST
           # This should be defined
-          value: backend-traces-agent.observability.svc.cluster.local
+          value: hotrod-traces-agent.observability.svc.cluster.local
         image: tkonthemove/backend:latest
         imagePullPolicy: Always
         name: backend

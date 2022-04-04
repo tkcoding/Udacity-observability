@@ -1,9 +1,9 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: frontend-app
+  name: frontend
   annotations:
-    "sidecar.jaegertracing.io/inject": "true"
+    sidecar.jaegertracing.io/inject: "true"
     prometheus.io/scrape: "true"
     prometheus.io/path: /metrics
     prometheus.io/port: frontendport
@@ -23,19 +23,19 @@ spec:
       containers:
       - env:
         - name: JAEGER_HOST
-          value: backend-traces-agent.observability.svc.cluster.local
+          value: hotrod-traces-agent.observability.svc.cluster.local
         name: frontend
         image: tkonthemove/observability_frontend:latest
         imagePullPolicy: Always
         ports:
         - name: frontendport
-          containerPort: 8081
+          containerPort: 8080
           protocol: TCP
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: frontend-service
+  name: frontend
   labels:
     app: frontend # service-monitor target
 spec:
@@ -43,7 +43,27 @@ spec:
     app: frontend # pod selection criteria
   ports:
     - name: frontend # must exist for prometheus scraping
-      port: 8081
+      port: 8080
       protocol: TCP
       targetPort: frontendport
   type: LoadBalancer
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: frontend
+  namespace: monitoring
+  labels:
+    app: frontend
+    release: prometheus
+spec:
+  selector:
+    matchLabels:
+      app: frontend
+  endpoints:
+  - port: frontend
+    path: /metrics
+    interval: 15s
+  namespaceSelector:
+    matchNames:
+    - default

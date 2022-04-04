@@ -23,13 +23,13 @@ spec:
       containers:
       - env:
         - name: JAEGER_HOST
-          value: backend-traces-agent.observability.svc.cluster.local
+          value: hotrod-traces-agent.observability.svc.cluster.local
         name: trial
         image: tkonthemove/observability_trial:latest
         imagePullPolicy: Always
         ports:
         - name: trialport
-          containerPort: 8083
+          containerPort: 8080
           protocol: TCP
 ---
 apiVersion: v1
@@ -43,7 +43,7 @@ spec:
     app: trial # pod selection criteria
   ports:
     - name: trial # must exist for prometheus scraping
-      port: 8083
+      port: 8082
       protocol: TCP
       targetPort: trialport
   type: LoadBalancer

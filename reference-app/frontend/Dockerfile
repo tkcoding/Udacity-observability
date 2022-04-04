@@ -16,4 +16,4 @@ RUN apt-get update && \
     pip install -r requirements.txt
 
 EXPOSE 8081
-CMD ["gunicorn", "-c", "config.py", "--access-logfile", "-", "--error-logfile", "-", "-w", "4", "-b", "0.0.0.0:8081", "app:app"]
+CMD ["gunicorn", "-c", "config.py", "--access-logfile", "-", "--error-logfile", "-", "-w", "4", "-b", "0.0.0.0:8080", "app:app"]

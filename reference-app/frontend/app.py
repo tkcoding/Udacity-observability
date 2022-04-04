@@ -1,9 +1,10 @@
+
 from flask import Flask, render_template, request
 
 # Monitoring
 from prometheus_flask_exporter import PrometheusMetrics
 from prometheus_flask_exporter.multiprocess import GunicornPrometheusMetrics
-
+from jaeger_client import Config
 # Tracing
 from opentelemetry import trace
 from opentelemetry.exporter.jaeger.thrift import JaegerExporter
@@ -12,68 +13,61 @@ from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import BatchSpanProcessor
 from opentelemetry.instrumentation.flask import FlaskInstrumentor
 from opentelemetry.instrumentation.requests import RequestsInstrumentor
+from flask_opentracing import FlaskTracing
 
 app = Flask(__name__)
+app.config['MONGO_DBNAME'] = 'example-mongodb'
+app.config['MONGO_URI'] = 'mongodb://example-mongodb-svc.default.svc.cluster.local:27017/example-mongodb'
 
 # -- Monitoring: Define Monitoring metrics
 metrics = PrometheusMetrics(app)
-#metrics = GunicornPrometheusMetrics(app)
 metrics.info("app_info", "Application info", version="1.0.3")
-# Sample custom metrics (unused since there are no outgoing requests)
-record_requests_by_status = metrics.summary(
-        'requests_by_status', 'Request latencies by status',
-        labels={'status': lambda: request.status_code()}
+common_counter = metrics.counter(
+    'by_endpoint_counter', 'Request count by endpoints',
+    labels={'endpoint': lambda: request.endpoint}
 )
-record_page_visits = metrics.counter(
-    'invocation_by_type', 'Number of invocations by type',
-    labels={'item_type': lambda: request.view_args['type']}
+record_requests_by_status = metrics.summary(
+    'requests_by_status', 'Request latencies by status',
+    labels={'status': lambda: request.status_code()}
 )
 
 # -- Observability: Prep app for tracing -- 
-FlaskInstrumentor().instrument_app(app)
-RequestsInstrumentor().instrument()
-# -- -- Configure Tracer 
-trace.set_tracer_provider(
-    TracerProvider(
-        resource=Resource.create({SERVICE_NAME: "front-service"})  
-    )
-)
-# -- -- Set Jaeger Exporter --
-jaeger_exporter = JaegerExporter(
-    # configure agent
-    agent_host_name='localhost',
-    agent_port=6831,
-    # optional: configure also collector
-    # collector_endpoint='http://localhost:14268/api/traces?format=jaeger.thrift',
-    # username=xxxx, # optional
-    # password=xxxx, # optional
-    # max_tag_value_length=None # optional
-)
-
-# -- -- Create a BatchSpanProcessor and add the exporter to it --
-trace.get_tracer_provider().add_span_processor(
-    BatchSpanProcessor(jaeger_exporter)
-)
-# -- -- Initialize Tracer --
-tracer = trace.get_tracer(__name__)
+config = Config(
+    config={
+        'sampler':
+            {
+                'type': 'const',
+                'param': 1
+            },
+        'logging': True,
+        'reporter_batch_size': 1,
+    },
+    service_name="frontend",
+    validate=True)
+jaeger_tracer = config.initialize_tracer()
+tracing = FlaskTracing(jaeger_tracer, True, app)
 
 # -- Application Body: Routes and Logic --
+
 @app.route("/")
 def homepage():
-    with tracer.start_as_current_span("homepage"):
-        return render_template("main.html")
+    with jaeger_tracer.start_span("homepage") as span:
+        span.set_tag('message', "homepage")
+    return render_template("main.html")
 
-@app.route("/success-response")
-def client_success_page():
-    return "Planned 200 response", 200
+@app.route("/error")
+@metrics.summary('requests_by_status_5xx', 'Status Code', labels={
+    'code': lambda r: '500'
+})
+def oops():
+    return ":(", 500
 
-@app.route("/client-error")
-def client_error_page():
-    return "Planned 400 error", 400
-
-@app.route("/server-error")
-def server_error_page():
-    return "Planned 500 error", 500
-
+metrics.register_default(
+    metrics.counter(
+        'by_path_counter', 'Request count by request paths',
+        labels={'path': lambda: request.path}
+    )
+)
 if __name__ == "__main__":
     app.run()
+
